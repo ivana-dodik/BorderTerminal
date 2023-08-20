@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.unibl.etf.gui.*?>
+
+<ScrollPane fitToWidth="true" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unibl.etf.controller.SimulationController">
+    <AnchorPane>
+        <padding>
+            <Insets top="20.0" />
+        </padding>
+        <Label layoutX="520.0" layoutY="20.0" text="Border Terminal Simulation">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+        <BorderTerminalButton fx:id="firstPoliceTerminalBtn" layoutX="420.0" layoutY="260.0" mnemonicParsing="false">
+            <styleClass>
+                <String fx:value="borderTerminal" />
+                <String fx:value="policeTerminal" />
+            </styleClass>
+        </BorderTerminalButton>
+        <BorderTerminalButton fx:id="secondPoliceTerminalBtn" layoutX="670.0" layoutY="260.0" mnemonicParsing="false">
+            <styleClass>
+                <String fx:value="borderTerminal" />
+                <String fx:value="policeTerminal" />
+            </styleClass>
+        </BorderTerminalButton>
+        <BorderTerminalButton fx:id="policeTerminalForTrucksBtn" layoutX="920.0" layoutY="260.0" mnemonicParsing="false">
+            <styleClass>
+                <String fx:value="borderTerminal" />
+                <String fx:value="policeTerminalForTruck" />
+            </styleClass>
+        </BorderTerminalButton>
+        <BorderTerminalButton fx:id="customsTerminalBtn" layoutX="420.0" layoutY="140.0" mnemonicParsing="false">
+            <styleClass>
+                <String fx:value="borderTerminal" />
+                <String fx:value="customsTerminal" />
+            </styleClass>
+        </BorderTerminalButton>
+        <BorderTerminalButton fx:id="customsTerminalForTrucksBtn" layoutX="920.0" layoutY="140.0" mnemonicParsing="false">
+            <styleClass>
+                <String fx:value="borderTerminal" />
+                <String fx:value="customsTerminalForTrucks" />
+            </styleClass>
+        </BorderTerminalButton>
+        <Label layoutX="432.0" layoutY="305.0" text="P1" />
+        <Label layoutX="682.0" layoutY="305.0" text="P2" />
+        <Label layoutX="932.0" layoutY="305.0" text="PT" />
+        <Label layoutX="932.0" layoutY="185.0" text="CT" />
+        <Label layoutX="432.0" layoutY="185.0" text="C1" />
+        <VBox fx:id="mainLane" layoutX="640.0" layoutY="380.0" prefHeight="140.0" prefWidth="100.0" styleClass="mainLane" />
+        <VBox fx:id="sideLane" layoutX="75.0" layoutY="55.0" prefHeight="200.0" prefWidth="100.0" styleClass="sideLane" />
+        <Button fx:id="startBtn" layoutX="1000.0" layoutY="20.0" mnemonicParsing="false" onAction="#start" prefWidth="200.0" text="Start Simulation" />
+        <Label layoutX="1000.0" layoutY="180.0" text="Elapsed (s):">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+        <Label fx:id="elapsedSecondsLabel" layoutX="1125.0" layoutY="180.0" textFill="#245cd3">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+        <Label fx:id="simulationFinishedLabel" layoutX="1000.0" layoutY="220.0" text="Simulation finished! Report generated." textFill="#33b52c" visible="false">
+            <font>
+                <Font name="System Bold" size="13.0" />
+            </font>
+        </Label>
+        <Button fx:id="policeReportBtn" layoutX="1000.0" layoutY="250.0" mnemonicParsing="false" prefWidth="200.0" text="Show Police Report" visible="false" />
+        <Button fx:id="customsReportBtn" layoutX="1000.0" layoutY="290.0" mnemonicParsing="false" prefWidth="200.0" text="Show Customs Report" visible="false" />
+        <Button fx:id="bothReportBtn" layoutX="1000.0" layoutY="330.0" mnemonicParsing="false" prefWidth="200.0" text="Show Both Reports" visible="false" />
+        <TextArea fx:id="reportTextArea" layoutX="1000.0" layoutY="370.0" prefHeight="700.0" prefWidth="500.0" visible="false" />
+        <Button fx:id="pauseBtn" disable="true" layoutX="1220.0" layoutY="60.0" mnemonicParsing="false" prefWidth="200.0" text="Pause Simulation" />
+        <Button fx:id="resumeBtn" disable="true" layoutX="1220.0" layoutY="20.0" mnemonicParsing="false" prefWidth="200.0" text="Resume Simulation" />
+        <Button fx:id="restartBtn" disable="true" layoutX="1220.0" layoutY="100.0" mnemonicParsing="false" prefWidth="200.0" text="Restart Simulation" />
+    </AnchorPane>
+</ScrollPane>

@@ -1,0 +1,249 @@
+.borderTerminal, .vehicle {
+   -fx-background-color: transparent;
+   -fx-background-radius: 0;
+   -fx-border-radius: 0;
+   -fx-text-fill: white;
+}
+
+.borderTerminal {
+   -fx-min-width: 40px;
+   -fx-min-height: 40px;
+   -fx-max-width: 40px;
+   -fx-max-height: 40px;
+   -fx-border-color: black;
+}
+
+.vehicle {
+   -fx-min-width: 24px;
+   -fx-min-height: 24px;
+   -fx-max-width: 24px;
+   -fx-max-height: 24px;
+   -fx-border-color: white;
+}
+
+.vehicle, .mainLane_vehicle {
+   -fx-border-color: white;
+}
+
+.mainLane_vehicle {
+   -fx-min-width: 40px;
+   -fx-min-height: 40px;
+   -fx-max-width: 40px;
+   -fx-max-height: 40px;
+}
+
+.policeTerminal {
+   -fx-background-color: lightblue;
+}
+
+.policeTerminalForTruck {
+   -fx-background-color: #8ec6ff;
+}
+
+.customsTerminal {
+   -fx-background-color: lightgreen;
+}
+
+.customsTerminalForTrucks {
+   -fx-background-color: #91ff8e;
+}
+
+.mainLane {
+   -fx-background-color: #666666;
+   -fx-padding: 10px;
+   -fx-alignment: top-center;
+}
+
+.sideLane {
+   -fx-background-color: #999999;
+   -fx-padding: 10px;
+   -fx-alignment: top-center;
+}
+
+.car {
+   -fx-background-color: #e8bebe;
+}
+
+.carPoliceTerminal {
+   -fx-background-color: #D66C73;
+}
+
+.truck {
+   -fx-background-color: #b8b8e7;
+}
+
+.truckPoliceTerminal {
+   -fx-background-color: #2F3F7A;
+}
+
+.bus {
+   -fx-background-color: #96d2c2;
+}
+
+.image_bus_1_small {
+   -fx-graphic: url("images/bus_1_small.png");
+}
+
+.image_bus_1_big {
+   -fx-graphic: url("images/bus_1_big.png");
+}
+
+.image_bus_2_small {
+   -fx-graphic: url("images/bus_2_small.png");
+}
+
+.image_bus_2_big {
+   -fx-graphic: url("images/bus_2_big.png");
+}
+
+.image_bus_3_small {
+   -fx-graphic: url("images/bus_3_small.png");
+}
+
+.image_bus_3_big {
+   -fx-graphic: url("images/bus_3_big.png");
+}
+
+.image_bus_4_small {
+   -fx-graphic: url("images/bus_4_small.png");
+}
+
+.image_bus_4_big {
+   -fx-graphic: url("images/bus_4_big.png");
+}
+
+.image_bus_5_small {
+   -fx-graphic: url("images/bus_5_small.png");
+}
+
+.image_bus_5_big {
+   -fx-graphic: url("images/bus_5_big.png");
+}
+
+.image_bus_6_small {
+   -fx-graphic: url("images/bus_6_small.png");
+}
+
+.image_bus_6_big {
+   -fx-graphic: url("images/bus_6_big.png");
+}
+
+.image_bus_7_small {
+   -fx-graphic: url("images/bus_7_small.png");
+}
+
+.image_bus_7_big {
+   -fx-graphic: url("images/bus_7_big.png");
+}
+
+.image_car_1_small {
+   -fx-graphic: url("images/car_1_small.png");
+}
+
+.image_car_1_big {
+   -fx-graphic: url("images/car_1_big.png");
+}
+
+.image_car_2_small {
+   -fx-graphic: url("images/car_2_small.png");
+}
+
+.image_car_2_big {
+   -fx-graphic: url("images/car_2_big.png");
+}
+
+.image_car_3_small {
+   -fx-graphic: url("images/car_3_small.png");
+}
+
+.image_car_3_big {
+   -fx-graphic: url("images/car_3_big.png");
+}
+
+.image_car_4_small {
+   -fx-graphic: url("images/car_4_small.png");
+}
+
+.image_car_4_big {
+   -fx-graphic: url("images/car_4_big.png");
+}
+
+.image_car_5_small {
+   -fx-graphic: url("images/car_5_small.png");
+}
+
+.image_car_5_big {
+   -fx-graphic: url("images/car_5_big.png");
+}
+
+.image_car_6_small {
+   -fx-graphic: url("images/car_6_small.png");
+}
+
+.image_car_6_big {
+   -fx-graphic: url("images/car_6_big.png");
+}
+
+.image_car_7_small {
+   -fx-graphic: url("images/car_7_small.png");
+}
+
+.image_car_7_big {
+   -fx-graphic: url("images/car_7_big.png");
+}
+
+.image_truck_1_small {
+   -fx-graphic: url("images/truck_1_small.png");
+}
+
+.image_truck_1_big {
+   -fx-graphic: url("images/truck_1_big.png");
+}
+
+.image_truck_2_small {
+   -fx-graphic: url("images/truck_2_small.png");
+}
+
+.image_truck_2_big {
+   -fx-graphic: url("images/truck_2_big.png");
+}
+
+.image_truck_3_small {
+   -fx-graphic: url("images/truck_3_small.png");
+}
+
+.image_truck_3_big {
+   -fx-graphic: url("images/truck_3_big.png");
+}
+
+.image_truck_4_small {
+   -fx-graphic: url("images/truck_4_small.png");
+}
+
+.image_truck_4_big {
+   -fx-graphic: url("images/truck_4_big.png");
+}
+
+.image_truck_5_small {
+   -fx-graphic: url("images/truck_5_small.png");
+}
+
+.image_truck_5_big {
+   -fx-graphic: url("images/truck_5_big.png");
+}
+
+.image_truck_6_small {
+   -fx-graphic: url("images/truck_6_small.png");
+}
+
+.image_truck_6_big {
+   -fx-graphic: url("images/truck_6_big.png");
+}
+
+.image_truck_7_small {
+   -fx-graphic: url("images/truck_7_small.png");
+}
+
+.image_truck_7_big {
+   -fx-graphic: url("images/truck_7_big.png");
+}
