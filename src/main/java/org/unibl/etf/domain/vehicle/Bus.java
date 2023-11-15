@@ -19,4 +19,10 @@ public class Bus extends Vehicle {
          passengers.add(new BusPassenger());
       }
    }
+
+   @Override
+   protected boolean processAtCustoms() throws InterruptedException {
+      checkPassengerLuggage();
+      return true;
+   }
 }

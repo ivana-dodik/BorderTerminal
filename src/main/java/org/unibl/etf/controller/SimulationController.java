@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
@@ -36,8 +37,8 @@ public class SimulationController implements Initializable {
    private static final String PAUSED_BORDER_STATUS = "00000";
    private static final int NUMBER_OF_VEHICLES_IN_MAIN_LANE = 5;
    private static final int NUMBER_OF_BUSES = 5;
-   private static final int NUMBER_OF_TRUCKS = 5;
-   private static final int NUMBER_OF_CARS = 5;
+   private static final int NUMBER_OF_TRUCKS = 10;
+   private static final int NUMBER_OF_CARS = 35;
    public static Queue<Vehicle> vehicles;
    private final AtomicInteger seconds = new AtomicInteger(0);
    private final CountDownLatch countDownLatch = new CountDownLatch(NUMBER_OF_BUSES + NUMBER_OF_CARS + NUMBER_OF_TRUCKS);
@@ -51,6 +52,7 @@ public class SimulationController implements Initializable {
    public BorderTerminalButton customsTerminalBtn;
    @FXML
    public BorderTerminalButton customsTerminalForTrucksBtn;
+   public TextArea logTextArea;
    private ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
    @FXML
    private Button startBtn;
@@ -77,6 +79,7 @@ public class SimulationController implements Initializable {
    private VBox mainLane;
    @FXML
    private VBox sideLane;
+   public HBox punishedLane;
 
    private List<DeniedPassengerReport> policeReport;
    private List<DeniedPassengerReport> customsReport;
@@ -101,7 +104,6 @@ public class SimulationController implements Initializable {
 
    private void pauseTerminals() {
       File filePath = new File(STATUS_FILE);
-      System.out.println("CAAAAAL");
       try {
          Files.writeString(filePath.toPath(), PAUSED_BORDER_STATUS);
       } catch (IOException e) {
@@ -137,7 +139,6 @@ public class SimulationController implements Initializable {
 
       restartBtn.setOnMouseClicked(event -> {
          pauseBtn.setDisable(true);
-         restartBtn.setDisable(true);
          restartBtn.setDisable(true);
          startBtn.setDisable(false);
          simulationFinishedLabel.setVisible(false);
@@ -230,6 +231,7 @@ public class SimulationController implements Initializable {
       vehicle.setIconClass(vehicleButton.getBigIconClass());
       lane.getChildren().add(vehicleButton);
       laneButtons.add(vehicleButton);
+      vehicle.setButton(vehicleButton);
    }
 
    public void start() {
@@ -240,7 +242,6 @@ public class SimulationController implements Initializable {
    }
 
    private void startSimulation() {
-      // TODO: Code cleanup
       File filePath = new File(STATUS_FILE);
       resumeTerminals();
       FileAlterationObserver observer = new FileAlterationObserver(filePath.getParentFile(), pathname -> pathname.equals(filePath));
@@ -258,14 +259,18 @@ public class SimulationController implements Initializable {
 
          if (vehicle instanceof Car || vehicle instanceof Bus) {
             if (Vehicle.policeTerminal1.isWorking() && Vehicle.policeTerminal1.tryAcquire(vehicle)) {
-               LOGGER.info("Processing at police terminal 1: " + vehicle);
+               String msg = "Processing at police terminal 1: " + vehicle;
+               LOGGER.info(msg);
+               Platform.runLater(() -> logTextArea.appendText("\n" + msg));
                vehicles.remove().start();
                Platform.runLater(() -> {
                   updateLanes();
                   firstPoliceTerminalBtn.acquireVehicle(vehicle);
                });
             } else if (Vehicle.policeTerminal2.isWorking() && Vehicle.policeTerminal2.tryAcquire(vehicle)) {
-               LOGGER.info("Processing at police terminal 2: " + vehicle);
+               String msg = "Processing at police terminal 2: " + vehicle;
+               LOGGER.info(msg);
+               Platform.runLater(() -> logTextArea.appendText("\n" + msg));
                vehicles.remove().start();
                Platform.runLater(() -> {
                   updateLanes();
@@ -274,7 +279,9 @@ public class SimulationController implements Initializable {
             }
          } else if (vehicle instanceof Truck) {
             if (Vehicle.policeTerminalForTrucks.isWorking() && Vehicle.policeTerminalForTrucks.tryAcquire(vehicle)) {
-               LOGGER.info("Processing at police terminal for trucks: " + vehicle);
+               String msg = "Processing at police terminal for trucks: " + vehicle;
+               LOGGER.info(msg);
+               Platform.runLater(() -> logTextArea.appendText("\n" + msg));
                vehicles.remove().start();
                Platform.runLater(() -> {
                   updateLanes();
@@ -291,11 +298,11 @@ public class SimulationController implements Initializable {
       }
 
       timerExecutor.shutdownNow();
-      var optionalFilename = Vehicle.serializePassengersWithIllegalDocuments();
+      Optional<String> optionalFilename = Vehicle.serializePassengersWithIllegalDocuments();
       optionalFilename.ifPresentOrElse(s -> policeReport = Vehicle.deserializePassengersWithIllegalDocuments(s),
               () -> policeReport = List.of());
 
-      var optionalTxtFilename = Vehicle.writeReportAsTextDocument();
+      Optional<String> optionalTxtFilename = Vehicle.writeReportAsTextDocument();
       optionalTxtFilename.ifPresentOrElse(s -> customsReport = Vehicle.readReportFromTextDocument(s),
               () -> customsReport = List.of());
 

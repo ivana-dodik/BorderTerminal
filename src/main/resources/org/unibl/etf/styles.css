@@ -52,12 +52,21 @@
    -fx-background-color: #666666;
    -fx-padding: 10px;
    -fx-alignment: top-center;
+   -fx-border-color: black;
 }
 
 .sideLane {
    -fx-background-color: #999999;
    -fx-padding: 10px;
    -fx-alignment: top-center;
+   -fx-border-color: black;
+}
+
+.punishedLane {
+   -fx-background-color: #c1b6b6;
+   -fx-padding: 5px 10px;
+   -fx-alignment: center;
+   -fx-border-color: black;
 }
 
 .car {

@@ -9,6 +9,7 @@ import org.unibl.etf.domain.passenger.*;
 import org.unibl.etf.domain.terminal.BorderTerminal;
 import org.unibl.etf.domain.terminal.CustomsTerminal;
 import org.unibl.etf.domain.terminal.PoliceTerminal;
+import org.unibl.etf.gui.VehicleButton;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -28,12 +29,11 @@ public abstract class Vehicle extends Thread implements Serializable {
    protected static final Random RANDOM = new Random();
    private static final List<DeniedPassengerReport> passengersWithIllegalDocuments = new CopyOnWriteArrayList<>();
    private static final List<DeniedPassengerReport> passengersDeniedAtCustomsTerminal = new CopyOnWriteArrayList<>();
-   private static final int CAR_PROCESSING_TIME_CUSTOMS_TERMINAL = 2000;
    @Serial
    private static final long serialVersionUID = 2023_08_02L;
    private static final Logger LOGGER = LoggerFactory.getLogger(Vehicle.class);
    private static final Faker faker = new Faker();
-   private static SimulationController simulationController;
+   protected static SimulationController simulationController;
    protected final List<Passenger> passengers;
    protected final int maxPassengers;
    private final String licensePlate;
@@ -41,6 +41,7 @@ public abstract class Vehicle extends Thread implements Serializable {
    protected int passengerProcessingTime;
    private Driver driver;
    private String iconClass;
+   protected VehicleButton button;
 
    public Vehicle(int maxPassengers) {
       this.passengers = new ArrayList<>();
@@ -183,24 +184,26 @@ public abstract class Vehicle extends Thread implements Serializable {
             new DeniedPassengerReport(passenger, this.toString(), DenialReason.ILLEGAL_SUITCASE));
    }
 
-   private void reportOverweightCargo() {
+   protected void reportOverweightCargo() {
       passengers.forEach(passenger -> passengersDeniedAtCustomsTerminal.add(
             new DeniedPassengerReport(passenger, this.toString(), DenialReason.OVERWEIGHT_CARGO)));
    }
 
-   private boolean isIllegalDriver() throws InterruptedException {
+   protected boolean isIllegalDriver() throws InterruptedException {
       sleep(passengerProcessingTime);
       if (!driver.getPassengerId().isValid()) {
          reportIllegalDocuments(driver);
          reportStrandedPassengers();
-         LOGGER.warn("Vehicle: " + this + ", couldn't pass police terminal as the driver had invalid documents.");
+         String msg = "Vehicle: " + this + ", couldn't pass police terminal as the driver had invalid documents.";
+         LOGGER.warn(msg);
+         Platform.runLater(() -> simulationController.logTextArea.appendText("\n" + msg));
          return true;
       }
 
       return false;
    }
 
-   private void checkOtherPassengersDocuments() throws InterruptedException {
+   protected void checkOtherPassengersDocuments() throws InterruptedException {
       List<Passenger> passengersToRemove = new ArrayList<>();
       for (int i = 1; i < passengers.size(); i++) {
          sleep(passengerProcessingTime);
@@ -208,7 +211,9 @@ public abstract class Vehicle extends Thread implements Serializable {
          if (!passenger.getPassengerId().isValid()) {
             passengersToRemove.add(passenger);
             reportIllegalDocuments(passenger);
-            LOGGER.warn("Removed passenger: " + passenger + ", because of invalid documents from: " + this);
+            String msg = "Removed passenger: " + passenger + ", because of invalid documents from: " + this;
+            Platform.runLater(() -> simulationController.logTextArea.appendText("\n" + msg));
+            LOGGER.warn(msg);
          }
       }
 
@@ -216,7 +221,7 @@ public abstract class Vehicle extends Thread implements Serializable {
       passengers.removeAll(passengersToRemove);
    }
 
-   private void checkPassengerLuggage() throws InterruptedException {
+   protected void checkPassengerLuggage() throws InterruptedException {
       List<Passenger> passengersToRemove = new ArrayList<>();
       for (int i = 1; i < passengers.size(); i++) {
          sleep(passengerProcessingTime);
@@ -224,7 +229,9 @@ public abstract class Vehicle extends Thread implements Serializable {
          if (passenger.hasIllegalItems()) {
             passengersToRemove.add(passenger);
             reportIllegalSuitcase(passenger);
-            LOGGER.warn("Removed passenger: " + passenger + ", because of illegal items in suitcase, from: " + this);
+            String msg = "Removed passenger: " + passenger + ", because of illegal items in suitcase, from: " + this;
+            LOGGER.warn(msg);
+            Platform.runLater(() -> simulationController.logTextArea.appendText("\n" + msg));
          }
       }
 
@@ -232,112 +239,91 @@ public abstract class Vehicle extends Thread implements Serializable {
       passengers.removeAll(passengersToRemove);
    }
 
+   protected boolean processVehicle() throws InterruptedException {
+      if (policeTerminal1.hasVehicle(this)) {
+         if (isIllegalDriver()) {
+            Platform.runLater(() -> {
+               simulationController.firstPoliceTerminalBtn.releaseVehicle();
+               simulationController.punishedLane.getChildren().add(button);
+            });
+            policeTerminal1.release();
+            return false;
+         }
+
+         checkOtherPassengersDocuments();
+
+         customsTerminal.acquire(this);
+
+         String msg1 = "Processed: " + this + " at police terminal 1";
+         String msg2 = "Forwarded to customs terminal: " + this;
+
+         LOGGER.info(msg1);
+         LOGGER.info(msg2);
+
+         Platform.runLater(() -> {
+            simulationController.firstPoliceTerminalBtn.releaseVehicle();
+            simulationController.customsTerminalBtn.acquireVehicle(this);
+            simulationController.logTextArea.appendText("\n" + msg1);
+            simulationController.logTextArea.appendText("\n" + msg2);
+         });
+
+         policeTerminal1.release();
+      } else if (policeTerminal2.hasVehicle(this)) {
+         if (isIllegalDriver()) {
+            Platform.runLater(() -> {
+               simulationController.secondPoliceTerminalBtn.releaseVehicle();
+               simulationController.punishedLane.getChildren().add(button);
+            });
+            policeTerminal2.release();
+            return false;
+         }
+
+         checkOtherPassengersDocuments();
+
+         customsTerminal.acquire(this);
+
+         String msg1 = "Processed: " + this + " at police terminal 2";
+         String msg2 = "Forwarded to customs terminal: " + this;
+
+         LOGGER.info(msg1);
+         LOGGER.info(msg2);
+
+         Platform.runLater(() -> {
+            simulationController.secondPoliceTerminalBtn.releaseVehicle();
+            simulationController.customsTerminalBtn.acquireVehicle(this);
+            simulationController.logTextArea.appendText("\n" + msg1);
+            simulationController.logTextArea.appendText("\n" + msg2);
+         });
+
+         policeTerminal2.release();
+      }
+
+      return processAtCustoms();
+   }
+
+   protected abstract boolean processAtCustoms() throws InterruptedException;
+
+   protected void releaseFromCustoms() {
+      String msg = "Finished processing at customs terminal of: " + this;
+      LOGGER.info(msg);
+      Platform.runLater(() -> {
+         simulationController.customsTerminalBtn.releaseVehicle();
+         simulationController.logTextArea.appendText("\n" + msg);
+      });
+      customsTerminal.release();
+   }
+
    @Override
    public void run() {
-      boolean needsRelease = false;
+      boolean needsReleaseFromCustomsTerminal = false;
       try {
-         int totalProcessingTime = passengerProcessingTime * passengers.size();
-         if (this instanceof Car || this instanceof Bus) {
-
-            if (policeTerminal1.hasVehicle(this)) {
-               if (isIllegalDriver()) {
-                  Platform.runLater(() -> simulationController.firstPoliceTerminalBtn.releaseVehicle());
-                  policeTerminal1.release();
-                  return;
-               }
-
-               checkOtherPassengersDocuments();
-
-               customsTerminal.acquire(this);
-               needsRelease = true;
-
-               LOGGER.info("Processed: " + this + " at police terminal 1");
-               LOGGER.info("Forwarded to customs terminal: " + this);
-
-               Platform.runLater(() -> {
-                  simulationController.firstPoliceTerminalBtn.releaseVehicle();
-                  simulationController.customsTerminalBtn.acquireVehicle(this);
-               });
-
-               policeTerminal1.release();
-            } else if (policeTerminal2.hasVehicle(this)) {
-               if (isIllegalDriver()) {
-                  Platform.runLater(() -> simulationController.secondPoliceTerminalBtn.releaseVehicle());
-                  policeTerminal2.release();
-                  return;
-               }
-
-               checkOtherPassengersDocuments();
-
-               customsTerminal.acquire(this);
-               needsRelease = true;
-
-               LOGGER.info("Processed: " + this + " at police terminal 2");
-               LOGGER.info("Forwarded to customs terminal: " + this);
-
-               Platform.runLater(() -> {
-                  simulationController.secondPoliceTerminalBtn.releaseVehicle();
-                  simulationController.customsTerminalBtn.acquireVehicle(this);
-               });
-
-               policeTerminal2.release();
-            }
-
-            if (this instanceof Car) {
-               sleep(CAR_PROCESSING_TIME_CUSTOMS_TERMINAL);
-            } else {
-               checkPassengerLuggage();
-            }
-         } else if (this instanceof Truck truck) {
-            if (isIllegalDriver()) {
-               Platform.runLater(() -> simulationController.policeTerminalForTrucksBtn.releaseVehicle());
-               policeTerminalForTrucks.release();
-               return;
-            }
-
-            checkOtherPassengersDocuments();
-
-            customsTerminalForTrucks.acquire(this);
-            needsRelease = true;
-
-            LOGGER.info("Processed: " + this + " at police terminal for trucks");
-            LOGGER.info("Forwarded to customs terminal for trucks: " + this);
-
-            Platform.runLater(() -> {
-               simulationController.policeTerminalForTrucksBtn.releaseVehicle();
-               simulationController.customsTerminalForTrucksBtn.acquireVehicle(this);
-            });
-
-            policeTerminalForTrucks.release();
-
-            sleep(totalProcessingTime);
-            if (truck.getCargo().requiresDocuments()) {
-               LOGGER.info("Issued customs documents for: " + truck);
-            }
-
-            if (truck.getCargo().isOverloaded()) {
-               reportOverweightCargo();
-               LOGGER.warn(truck + ", couldn't pass the customs terminal, it's overloaded");
-               Platform.runLater(() -> simulationController.customsTerminalForTrucksBtn.releaseVehicle());
-               customsTerminalForTrucks.release();
-               needsRelease = false;
-            }
-         }
+         needsReleaseFromCustomsTerminal = processVehicle();
       } catch (InterruptedException e) {
          LOGGER.error(e.getMessage());
       } finally {
-         if (needsRelease) {
-            if (this instanceof Car || this instanceof Bus) {
-               LOGGER.info("Finished processing at customs terminal of: " + this);
-               Platform.runLater(() -> simulationController.customsTerminalBtn.releaseVehicle());
-               customsTerminal.release();
-            } else {
-               LOGGER.info("Finished processing at customs terminal for trucks: " + this);
-               Platform.runLater(() -> simulationController.customsTerminalForTrucksBtn.releaseVehicle());
-               customsTerminalForTrucks.release();
-            }
+         if (needsReleaseFromCustomsTerminal) {
+            releaseFromCustoms();
          }
-
          simulationController.countDown(); // this thread has finished it's work, so we count down
       }
    }
@@ -371,5 +357,9 @@ public abstract class Vehicle extends Thread implements Serializable {
 
    public void setIconClass(String iconClass) {
       this.iconClass = iconClass;
+   }
+
+   public void setButton(VehicleButton vehicleButton) {
+      this.button = vehicleButton;
    }
 }
