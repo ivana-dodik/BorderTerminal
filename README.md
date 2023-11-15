@@ -1,4 +1,2 @@
 # BorderTerminal
-A JavaFX GUI application project for Programming Languages 2 subject at University
-
-A Java(FX) Maven project.
+A JavaFX GUI application maven project for Programming Languages 2 subject at University
